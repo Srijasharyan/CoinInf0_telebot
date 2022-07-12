@@ -14,7 +14,7 @@ import requests
 from requests import Session
 
 def coin_check(text):
-  coin=['Bitcoin','Ethereum','Tether','USD Coin','BNB','Binance USD','XRP','Cardano','Solana','Dogecoin', 'Dai', 'Polkadot' 'TRON', 'Shiba Inu', 'Avalanche', 'Wrapped Bitcoin',
+  coin=['Bitcoin','Ethereum','Tether','USD Coin','BNB','Binance USD','XRP','Cardano','Solana','Dogecoin', 'Dai', 'Polkadot' ,'TRON', 'Shiba Inu', 'Avalanche', 'Wrapped Bitcoin',
   'UNUS SED LEO','Uniswap','Polygon','Litecoin','FTX Token','Cronos','Chainlink','Stellar','Cosmos','NEAR Protocol','Monero','Algorand','Ethereum Classic','Bitcoin Cash',
   'VeChain','Flow', 'Internet Computer', 'Decentraland', 'Tezos', 'The Sandbox', 'ApeCoin', 'Hedera', 'Filecoin', 'TrueUSD', 'Theta Network', 'Axie Infinity', 'Elrond', 'Helium',
   'Aave', 'Bitcoin SV', 'EOS', 'Pax Dollar', 'Quant', 'Maker', 'KuCoin Token', 'Zcash', 'BitTorrent-New', 'IOTA', 'eCash', 'OKB', 'Neutrino USD', 'USDD', 'THORChain',
@@ -29,8 +29,8 @@ def coin_check(text):
     coin[i]=coin[i].lower()
   for i in range(len(coin)):
     if text.lower()== coin[i]:
-     if i>=99:
-       return i-99
+     if i>=100:
+       return i-100
      else:
        return i
   return -1
@@ -56,9 +56,13 @@ def print_data(coin):
   coin_n= (json.loads(response.text)["data"][coin_check(coin)]["name"])
   coin_s= (json.loads(response.text)["data"][coin_check(coin)]["symbol"])
   s=""
-  if coin_check(coin)==-1:
-    return "No coin found! Please try again..."
-  s=  coin_s+ ":   Price- " +u"\u20B9"+ str(c_price)+ "   24H%- "+ str(percent_change_24h)
+  if coin=="welcome":
+    return "Welcome to the cryptoBOT world!"
+  # elif coin=="hi" or "hello" or "hii" or "hlo" or "Hello" or "Hi":
+  #   return "Hello! Enter coin to know its latest price."
+  elif coin_check(coin)==-1:
+    return "No coin found! I'm still learning..."
+  s=  coin_s+ ":   Price:  " +u"\u20B9"+ str(c_price)+ "   24H%:  "+ str(percent_change_24h)
 
   return s
   
@@ -66,29 +70,35 @@ def print_data(coin):
 
 
 
-base_url="https://api.telegram.org/bot5311101083:AAHlUr0XLG8EPDK-JVi4yt8qheu_aqe4mTw"
+base_url="https://api.telegram.org/bot5479441757:AAHDUKdGvDAZAF2FWUCLwf4nZDqG4OyXK_g"
 def read_msg(offset):
   parameters={ 
     "offset" : offset
   }
   
     
-  resp =requests.get(base_url + "/getUpdates",data=parameters)
+  resp =    requests.get(base_url + "/getUpdates",data=parameters)
   data=resp.json()
 
   for result in data["result"]:
-    res= result["message"]["text"].split()
-    if len(res)>=1:
-      #if coin_check(res[0]):
-      send_msg(res[0])
-    #send_msg(result["message"]["text"])
+    send_msg(result)
+  
   if data["result"]:
-     return data["result"][-1]["update_id"]+1
+    return data["result"][-1]["update_id"] + 1
 
 def send_msg(coin):
+  if 'message' in coin:
+    if 'text' in coin["message"]:
+      text = coin["message"]["text"]
+    else:
+      text= "welcome"
+  else:
+    text="welcome"
+  
+  message_id = coin["message"]["message_id"]
   parameters={ 
-      "chat_id" : "5132037698",
-      "text" : print_data(coin)
+      "chat_id" : "-710842744",
+      "text" : print_data(text)
   } 
   resp=requests.get(base_url + "/sendMessage",parameters)
   print(resp.text)
