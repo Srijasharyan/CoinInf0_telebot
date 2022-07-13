@@ -13,29 +13,8 @@ import json
 import requests
 from requests import Session
 
-def coin_check(text):
-  coin=['Bitcoin','Ethereum','Tether','USD Coin','BNB','Binance USD','XRP','Cardano','Solana','Dogecoin', 'Dai', 'Polkadot' ,'TRON', 'Shiba Inu', 'Avalanche', 'Wrapped Bitcoin',
-  'UNUS SED LEO','Uniswap','Polygon','Litecoin','FTX Token','Cronos','Chainlink','Stellar','Cosmos','NEAR Protocol','Monero','Algorand','Ethereum Classic','Bitcoin Cash',
-  'VeChain','Flow', 'Internet Computer', 'Decentraland', 'Tezos', 'The Sandbox', 'ApeCoin', 'Hedera', 'Filecoin', 'TrueUSD', 'Theta Network', 'Axie Infinity', 'Elrond', 'Helium',
-  'Aave', 'Bitcoin SV', 'EOS', 'Pax Dollar', 'Quant', 'Maker', 'KuCoin Token', 'Zcash', 'BitTorrent-New', 'IOTA', 'eCash', 'OKB', 'Neutrino USD', 'USDD', 'THORChain',
-  'The Graph','Huobi Token', 'Klaytn', 'Fantom', 'Chiliz', 'Neo','PAX Gold', 'Basic Attention Token', 'Waves', 'STEPN', 'Stacks', 'Loopring', 'Zilliqa', 'Curve DAO Token', 'TerraClassicUSD',
-  'Dash', 'PancakeSwap', 'Enjin Coin', 'Fei USD', 'Kusama', 'Kava', 'Celo', 'Arweave', 'Compound', 'Mina', 'Amp', 'Convex Finance', 'Gala', 'NEM', '1inch Network', 'Holo', 'Nexo',
-  'Decred','XDC Network','GateToken', 'Gnosis', 'Qtum', 'Symbol', 'Kadena', 'IoTeX', 'BORA','BTC', 'ETH', 'USDT', 'USDC', 'BNB', 'BUSD', 'XRP', 'ADA', 'SOL', 'DOGE', 'DAI', 'DOT', 'TRX', 'SHIB', 'AVAX','WBTC','LEO','UNI','MATIC', 'LTC', 'FTT',
-  'CRO', 'LINK', 'XLM', 'ATOM', 'NEAR', 'XMR', 'ALGO', 'ETC', 'BCH', 'FLOW', 'ICP', 'MANA','XTZ', 'SAND', 'APE', 'HBAR', 'FIL', 'TUSD', 'THETA', 'AXS', 'EGLD', 'HNT',
-  'AAVE', 'BSV', 'EOS', 'USDP', 'QNT', 'MKR', 'KCS', 'ZEC', 'BTT', 'MIOTA', 'XEC', 'OKB', 'USDN', 'USDD', 'RUNE', 'GRT', 'HT', 'KLAY', 'FTM','CHZ', 'NEO','PAXG',
-  'BAT','WAVES', 'GMT', 'STX', 'LRC', 'ZIL', 'CRV', 'USTC', 'DASH', 'CAKE', 'ENJ', 'FEI', 'KSM', 'KAVA', 'CELO','AR', 'COMP', 'MINA', 'AMP', 'CVX', 'GALA', 'XEM', '1INCH',
-  'HOT', 'NEXO', 'DCR', 'XDC', 'GT', 'GNO', 'QTUM', 'XYM', 'KDA', 'IOTX', 'BORA']
-  for i in range(len(coin)):
-    coin[i]=coin[i].lower()
-  for i in range(len(coin)):
-    if text.lower()== coin[i]:
-     if i>=100:
-       return i-100
-     else:
-       return i
-  return -1
 
-def print_data(coin):
+def print_data(request):
   c_url="https://pro-api.coinmarketcap.com/v1/cryptocurrency/listings/latest"
   c_parameters = {
     'convert' : 'INR'
@@ -48,29 +27,34 @@ def print_data(coin):
   session.headers.update(headers)
 
   response=session.get(c_url,params=c_parameters)
-  c_price=(json.loads(response.text)["data"][coin_check(coin)]["quote"]["INR"]["price"])
-  percent_change_24h = (json.loads(response.text)["data"][coin_check(coin)]["quote"]["INR"]["percent_change_24h"])
-  percent_change_1w = (json.loads(response.text)["data"][coin_check(coin)]["quote"]["INR"]["percent_change_7d"])
-  percent_change_30d = (json.loads(response.text)["data"][coin_check(coin)]["quote"]["INR"]["percent_change_30d"])
-  percent_change_1h = (json.loads(response.text)["data"][coin_check(coin)]["quote"]["INR"]["percent_change_1h"])
-  coin_n= (json.loads(response.text)["data"][coin_check(coin)]["name"])
-  coin_s= (json.loads(response.text)["data"][coin_check(coin)]["symbol"])
+  Data=json.loads(response.text)["data"]
+  ind=-1
+  for res in Data:
+    if request.lower() == res["name"].lower() or request.lower() == res["symbol"].lower():
+      ind= Data.index(res)
+
+  c_price=(json.loads(response.text)["data"][ind]["quote"]["INR"]["price"])
+  percent_change_24h = (json.loads(response.text)["data"][ind]["quote"]["INR"]["percent_change_24h"])
+  percent_change_1w = (json.loads(response.text)["data"][ind]["quote"]["INR"]["percent_change_7d"])
+  percent_change_30d = (json.loads(response.text)["data"][ind]["quote"]["INR"]["percent_change_30d"])
+  percent_change_1h = (json.loads(response.text)["data"][ind]["quote"]["INR"]["percent_change_1h"])
+  coin_n= (json.loads(response.text)["data"][ind]["name"])
+  coin_s= (json.loads(response.text)["data"][ind]["symbol"])
   s=""
-  if coin=="welcome":
+  if request=="welcome":
     return "Welcome to the cryptoBOT world!"
   # elif coin=="hi" or "hello" or "hii" or "hlo" or "Hello" or "Hi":
   #   return "Hello! Enter coin to know its latest price."
-  elif coin_check(coin)==-1:
+  elif ind == -1:
     return "No coin found! I'm still learning..."
-  s=  coin_s+ ":   Price:  " +u"\u20B9"+ str(c_price)+ "   24H%:  "+ str(percent_change_24h)
+
+  s=  coin_s+ "  :" +" "*50+"Price:  " +u"\u20B9"+ str(round(c_price, 4))+" "*30+  "24H%:   "+ str(round(percent_change_24h, 4))+" "*40+ "7d:  "+str(round(percent_change_1w, 4))
 
   return s
-  
-
-
-
 
 base_url="https://api.telegram.org/bot5479441757:AAHDUKdGvDAZAF2FWUCLwf4nZDqG4OyXK_g"
+
+
 def read_msg(offset):
   parameters={ 
     "offset" : offset
@@ -102,6 +86,9 @@ def send_msg(coin):
   } 
   resp=requests.get(base_url + "/sendMessage",parameters)
   print(resp.text)
+
+
+
 
 offset=0
 while True:
