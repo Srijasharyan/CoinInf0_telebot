@@ -16,4 +16,4 @@ Link of telegram:
   https://t.me/+e7-obzqkn1c0ZWI1
 
 
-Note: As the code contains API key for its functioning, it is not made publicly visible.
+
